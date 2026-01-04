@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Diamond Color Chart — LW Gems</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --ink:#0f172a;
+      --muted:#64748b;
+      --card:#ffffff;
+      --border:#e5e7eb;
+      --soft:#f8fafc;
+      --accent:#0ea5e9;
+      --warn:#f59e0b;
+      --warn-bg:#fff7ed;
+      --radius:16px;
+      --shadow: 0 10px 30px rgba(2,6,23,.06);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--ink);
+      background:linear-gradient(180deg,#fff, #fff 30%, #fbfdff);
+    }
+    .wrap{
+      max-width:1100px;
+      margin:32px auto 56px;
+      padding:0 18px;
+    }
+    header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+    }
+    h1{
+      margin:0;
+      font-size:30px;
+      letter-spacing:-.02em;
+    }
+    .sub{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .top-actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      border:1px solid var(--border);
+      background:#fff;
+      padding:10px 12px;
+      border-radius:999px;
+      box-shadow: 0 1px 0 rgba(2,6,23,.03);
+    }
+    .pill label{
+      font-size:12px;
+      color:var(--muted);
+      letter-spacing:.04em;
+      text-transform:uppercase;
+    }
+    .seg{
+      display:inline-flex;
+      border:1px solid var(--border);
+      border-radius:999px;
+      overflow:hidden;
+      background:var(--soft);
+    }
+    .seg button{
+      appearance:none;
+      border:0;
+      background:transparent;
+      padding:8px 12px;
+      font-size:13px;
+      color:var(--muted);
+      cursor:pointer;
+    }
+    .seg button.active{
+      background:#fff;
+      color:var(--ink);
+      box-shadow: 0 2px 10px rgba(2,6,23,.06);
+    }
+
+    .note{
+      margin:14px 0 18px;
+      color:var(--muted);
+      font-size:14px;
+      max-width:820px;
+    }
+
+    .panel{
+      border:1px solid var(--border);
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .panel-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 16px;
+      border-bottom:1px solid var(--border);
+      background:linear-gradient(180deg,#fff, #fbfdff);
+    }
+    .panel-head strong{font-size:14px}
+    .toggle{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:13px;
+      color:var(--muted);
+      user-select:none;
+    }
+    .toggle input{transform:scale(1.1)}
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+      padding:14px;
+    }
+    .grid.compare{
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 900px){
+      .grid.compare{grid-template-columns:1fr}
+    }
+
+    .card{
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:#fff;
+      padding:14px;
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+    }
+    .badge{
+      width:36px;height:36px;
+      border-radius:999px;
+      display:grid;
+      place-items:center;
+      font-weight:700;
+      background:#0b1220;
+      color:#fff;
+      flex:0 0 auto;
+    }
+    .meta{
+      flex:1 1 auto;
+      min-width: 0;
+    }
+    .kicker{
+      display:flex;
+      align-items:baseline;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .kicker .title{
+      font-size:16px;
+      font-weight:700;
+      margin:0;
+    }
+    .kicker .range{
+      font-family:var(--mono);
+      font-size:12px;
+      color:var(--muted);
+    }
+    .desc{
+      margin:8px 0 0;
+      color:#334155;
+      line-height:1.35;
+      font-size:14px;
+    }
+
+    .controls{
+      margin-top:12px;
+      display:grid;
+      gap:10px;
+    }
+    .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .row .label{
+      font-size:13px;
+      color:var(--muted);
+    }
+    .row .value{
+      font-family:var(--mono);
+      font-size:12px;
+      padding:5px 8px;
+      border:1px solid var(--border);
+      border-radius:10px;
+      background:var(--soft);
+      color:var(--ink);
+    }
+
+    input[type="range"]{
+      width:100%;
+      accent-color: var(--accent);
+    }
+
+    .letters{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-top:2px;
+    }
+    .letters button{
+      width:34px;height:34px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      cursor:pointer;
+      font-weight:600;
+      color:#334155;
+    }
+    .letters button.active{
+      border-color: rgba(14,165,233,.55);
+      box-shadow: 0 0 0 4px rgba(14,165,233,.12);
+      color:#0b1220;
+    }
+
+    .educ{
+      margin-top:12px;
+      border:1px solid rgba(245,158,11,.35);
+      background:var(--warn-bg);
+      color:#92400e;
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:13px;
+      line-height:1.35;
+    }
+
+    /* Diamond viz */
+    .viz{
+      margin-top:12px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:linear-gradient(180deg,#fff, #fbfdff);
+      padding:12px;
+      display:grid;
+      grid-template-columns: 160px 1fr;
+      gap:12px;
+      align-items:center;
+    }
+    @media (max-width: 520px){
+      .viz{grid-template-columns:1fr; justify-items:center; text-align:center;}
+    }
+    .viz small{
+      display:block;
+      color:var(--muted);
+      margin-top:6px;
+      font-size:12px;
+    }
+    .viz .stats{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-start;
+    }
+    @media (max-width: 520px){
+      .viz .stats{justify-content:center;}
+    }
+    .chip{
+      font-family:var(--mono);
+      font-size:12px;
+      padding:6px 8px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      background:#fff;
+      color:#0b1220;
+      display:inline-flex;
+      gap:6px;
+      align-items:center;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      border:1px solid rgba(2,6,23,.15);
+      background:#fff;
+    }
+
+    footer{
+      margin-top:18px;
+      color:var(--muted);
+      font-size:12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1 id="t_title">Diamond Color Chart</h1>
+        <div class="sub" id="t_sub">Referencia visual simplificada — uso educativo</div>
+      </div>
+      <div class="top-actions">
+        <div class="pill">
+          <label>Lang</label>
+          <div class="seg" role="tablist" aria-label="Language">
+            <button id="btnES" class="active" type="button">ES</button>
+            <button id="btnEN" type="button">EN</button>
+          </div>
+        </div>
+        <div class="pill">
+          <label id="t_mode">Modo</label>
+          <div class="seg" role="tablist" aria-label="Mode">
+            <button id="btnSingle" class="active" type="button">D–Z</button>
+            <button id="btnCompare" type="button" id="t_compareBtn">D–Z + comparación</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="note" id="t_note">
+      Nota: el color percibido depende de la iluminación, fluorescencia y entorno. Este módulo utiliza un modelo visual simplificado.
+    </div>
+
+    <section class="panel" aria-label="Interactive tool">
+      <div class="panel-head">
+        <strong id="t_pick">Seleccionar letra</strong>
+        <label class="toggle">
+          <input id="toggleCompare" type="checkbox" />
+          <span id="t_toggleCompare">Activar comparación</span>
+        </label>
+      </div>
+
+      <div id="grid" class="grid">
+        <!-- LEFT -->
+        <div class="card" id="cardA">
+          <div class="badge" id="badgeA">D</div>
+          <div class="meta">
+            <div class="kicker">
+              <div class="title" id="titleA">Colorless</div>
+              <div class="range" id="rangeA">D • Colorless (D–F)</div>
+            </div>
+            <p class="desc" id="descA"></p>
+
+            <div class="controls">
+              <div class="row">
+                <span class="label" id="t_letterA">Letra</span>
+                <span class="value" id="valA">D</span>
+              </div>
+              <input id="sliderA" type="range" min="0" max="22" step="1" value="0" />
+              <div class="letters" id="lettersA"></div>
+
+              <div class="viz" aria-label="Diamond visualization">
+                <div id="svgWrapA"></div>
+                <div>
+                  <div class="stats">
+                    <span class="chip"><span class="dot" id="dotA"></span><span id="chipToneA">tone</span></span>
+                    <span class="chip" id="chipGroupA">group</span>
+                    <span class="chip" id="chipIdxA">idx</span>
+                  </div>
+                  <small id="t_vizHelpA">Visual interactivo: brillo + tinte aproximado según la letra.</small>
+                </div>
+              </div>
+
+              <div class="educ" id="t_educA">
+                Nota: Esta referencia es educativa y no reemplaza una evaluación gemológica profesional.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT (COMPARE) -->
+        <div class="card" id="cardB" style="display:none;">
+          <div class="badge" id="badgeB">G</div>
+          <div class="meta">
+            <div class="kicker">
+              <div class="title" id="titleB">Near Colorless</div>
+              <div class="range" id="rangeB">G • Near Colorless (G–J)</div>
+            </div>
+            <p class="desc" id="descB"></p>
+
+            <div class="controls">
+              <div class="row">
+                <span class="label" id="t_letterB">Letra (comparación)</span>
+                <span class="value" id="valB">G</span>
+              </div>
+              <input id="sliderB" type="range" min="0" max="22" step="1" value="3" />
+              <div class="letters" id="lettersB"></div>
+
+              <div class="viz" aria-label="Diamond visualization compare">
+                <div id="svgWrapB"></div>
+                <div>
+                  <div class="stats">
+                    <span class="chip"><span class="dot" id="dotB"></span><span id="chipToneB">tone</span></span>
+                    <span class="chip" id="chipGroupB">group</span>
+                    <span class="chip" id="chipIdxB">idx</span>
+                  </div>
+                  <small id="t_vizHelpB">Visual interactivo: brillo + tinte aproximado según la letra.</small>
+                </div>
+              </div>
+
+              <div class="educ" id="t_educB">
+                Nota: Esta referencia es educativa y no reemplaza una evaluación gemológica profesional.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <footer>
+      <span id="t_footer">LW Gems · Herramientas gemológicas interactivas</span>
+    </footer>
+  </div>
+
+  <script>
+    // --- Data ---
+    const letters = "DEFGHIJKLMNOPQRSTUVWXYZ".split(""); // 23 letters
+
+    const i18n = {
+      es: {
+        title: "Diamond Color Chart",
+        sub: "Referencia visual simplificada — uso educativo",
+        note: "Nota: el color percibido depende de la iluminación, fluorescencia y entorno. Este módulo utiliza un modelo visual simplificado.",
+        pick: "Seleccionar letra",
+        mode: "Modo",
+        toggleOn: "Activar comparación",
+        toggleOff: "Desactivar comparación",
+        letterA: "Letra",
+        letterB: "Letra (comparación)",
+        educ: "Nota: Esta referencia es educativa y no reemplaza una evaluación gemológica profesional.",
+        vizHelp: "Visual interactivo: brillo + tinte aproximado según la letra.",
+        footer: "LW Gems · Herramientas gemológicas interactivas",
+        groupNames: {
+          colorless: "Incoloro",
+          near: "Casi incoloro",
+          faint: "Tinte leve",
+          veryLight: "Muy leve",
+          light: "Visible"
+        },
+        groupRanges: {
+          colorless: "D–F",
+          near: "G–J",
+          faint: "K–M",
+          veryLight: "N–R",
+          light: "S–Z"
+        },
+        // Descripciones ES por grupo (se personaliza levemente por letra)
+        desc: {
+          colorless: (L) => {
+            if (L==="D") return "Apariencia extremadamente blanca. El tinte es imperceptible incluso bajo observación profesional. Utilizado en la mayoría de las piezas de joyería de alta gama.";
+            if (L==="E") return "Apariencia muy blanca. El tinte es mínimo y difícil de detectar. Adecuado para la mayoría de las piezas de joyería.";
+            return "Blanco limpio con trazas apenas perceptibles. Mantiene una apariencia incolora en la mayoría de las aplicaciones de joyería.";
+          },
+          near: (L) => "A simple vista suele verse blanco. En comparación directa puede percibirse un leve matiz cálido. Muy utilizado en joyería fina.",
+          faint: (L) => "Tinte cálido sutil, más evidente en tamaños mayores o metales claros. Equilibrio habitual entre presencia visual y valor.",
+          veryLight: (L) => "Tinte visible sin llegar a ser intenso. Puede notarse en vista lateral o en piedras grandes. Se elige por relación costo/resultado.",
+          light: (L) => "Tinte claramente perceptible. En ciertos diseños puede ser intencional (estética cálida), pero no se considera 'blanco' en comparación directa."
+        }
+      },
+      en: {
+        title: "Diamond Color Chart",
+        sub: "Simplified visual reference — educational use",
+        note: "Note: perceived color depends on lighting, fluorescence, and environment. This module uses a simplified visual model.",
+        pick: "Select a letter",
+        mode: "Mode",
+        toggleOn: "Enable comparison",
+        toggleOff: "Disable comparison",
+        letterA: "Letter",
+        letterB: "Letter (compare)",
+        educ: "Note: This reference is educational and does not replace a professional gemological evaluation.",
+        vizHelp: "Interactive visual: highlight + approximate tint by letter.",
+        footer: "LW Gems · Interactive gemological tools",
+        groupNames: {
+          colorless: "Colorless",
+          near: "Near Colorless",
+          faint: "Faint Tint",
+          veryLight: "Very Light",
+          light: "Visible Tint"
+        },
+        groupRanges: {
+          colorless: "D–F",
+          near: "G–J",
+          faint: "K–M",
+          veryLight: "N–R",
+          light: "S–Z"
+        },
+        desc: {
+          colorless: (L) => {
+            if (L==="D") return "Exceptionally white appearance. Tint is virtually imperceptible even under professional observation. Commonly used in high-end jewelry.";
+            if (L==="E") return "Very white appearance. Tint is minimal and hard to detect. Suitable for most fine jewelry pieces.";
+            return "Clean white with barely noticeable traces. Remains visually colorless in most jewelry applications.";
+          },
+          near: (L) => "Often looks white face-up. In direct comparison, a slight warm nuance may appear. Widely used in fine jewelry.",
+          faint: (L) => "Subtle warmth, more noticeable in larger sizes or light metals. A common balance between visual presence and value.",
+          veryLight: (L) => "Noticeable tint without being strong. May show in side view or larger stones. Chosen for cost-to-result efficiency.",
+          light: (L) => "Clearly visible tint. Can be intentional in warm aesthetics, but it won’t read as 'white' in direct comparison."
+        }
+      }
+    };
+
+    function groupForLetter(L){
+      const idx = letters.indexOf(L);
+      if (idx <= 2) return "colorless";      // D,E,F
+      if (idx <= 6) return "near";           // G,H,I,J
+      if (idx <= 9) return "faint";          // K,L,M
+      if (idx <= 14) return "veryLight";     // N,O,P,Q,R
+      return "light";                         // S..Z
+    }
+
+    // Approx tint (warmth) by letter index: D(0) -> Z(22)
+    // We generate a subtle warm tint and a little lower "whiteness" as index increases.
+    function tintForIndex(i){
+      // whiteness from 1.00 to ~0.86
+      const w = 1.0 - (i/22)*0.14;
+      // warmth (yellow) from 0.00 to ~0.20
+      const y = (i/22)*0.20;
+      // Convert to an RGB-ish warm off-white
+      // Base is near white; add yellow by boosting R,G slightly and lowering B a bit.
+      const r = Math.round(255 * w + 255 * y * 0.15);
+      const g = Math.round(255 * w + 255 * y * 0.10);
+      const b = Math.round(255 * w - 255 * y * 0.65);
+      return { r: clamp(r, 0, 255), g: clamp(g, 0, 255), b: clamp(b, 0, 255), w, y };
+    }
+    function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+    function rgbToHex({r,g,b}){
+      const h = (n)=> n.toString(16).padStart(2,"0");
+      return `#${h(r)}${h(g)}${h(b)}`;
+    }
+
+    function diamondSVG(hexFill){
+      // SVG diamond with internal facets and highlight. Fill is controlled by hexFill.
+      return `
+      <svg width="150" height="120" viewBox="0 0 300 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ffffff" stop-opacity="0.90"/>
+            <stop offset="0.35" stop-color="${hexFill}" stop-opacity="0.92"/>
+            <stop offset="1" stop-color="#0b1220" stop-opacity="0.04"/>
+          </linearGradient>
+          <radialGradient id="spark" cx="35%" cy="25%" r="75%">
+            <stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/>
+            <stop offset="0.35" stop-color="#ffffff" stop-opacity="0.35"/>
+            <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#020617" flood-opacity="0.12"/>
+          </filter>
+        </defs>
+
+        <!-- outer -->
+        <g filter="url(#soft)">
+          <path d="M150 18 L240 80 L210 190 L150 226 L90 190 L60 80 Z"
+                fill="url(#g1)" stroke="rgba(2,6,23,.16)" stroke-width="2" />
+          <!-- facets -->
+          <path d="M150 18 L150 226" stroke="rgba(2,6,23,.12)" stroke-width="2"/>
+          <path d="M60 80 L240 80" stroke="rgba(2,6,23,.12)" stroke-width="2"/>
+          <path d="M90 190 L150 80 L210 190" fill="rgba(255,255,255,.18)"/>
+          <path d="M60 80 L150 80 L90 190" fill="rgba(255,255,255,.12)"/>
+          <path d="M240 80 L150 80 L210 190" fill="rgba(255,255,255,.10)"/>
+          <path d="M150 226 L90 190 L150 80 L210 190 Z" fill="rgba(255,255,255,.08)"/>
+          <!-- highlight -->
+          <ellipse cx="120" cy="70" rx="85" ry="70" fill="url(#spark)"/>
+        </g>
+      </svg>`;
+    }
+
+    // --- State ---
+    let lang = "es";
+    let compareOn = false;
+
+    const els = {
+      btnES: document.getElementById("btnES"),
+      btnEN: document.getElementById("btnEN"),
+      btnSingle: document.getElementById("btnSingle"),
+      btnCompare: document.getElementById("btnCompare"),
+      toggleCompare: document.getElementById("toggleCompare"),
+      grid: document.getElementById("grid"),
+      cardB: document.getElementById("cardB"),
+
+      t_title: document.getElementById("t_title"),
+      t_sub: document.getElementById("t_sub"),
+      t_note: document.getElementById("t_note"),
+      t_pick: document.getElementById("t_pick"),
+      t_mode: document.getElementById("t_mode"),
+      t_toggleCompare: document.getElementById("t_toggleCompare"),
+      t_letterA: document.getElementById("t_letterA"),
+      t_letterB: document.getElementById("t_letterB"),
+      t_educA: document.getElementById("t_educA"),
+      t_educB: document.getElementById("t_educB"),
+      t_vizHelpA: document.getElementById("t_vizHelpA"),
+      t_vizHelpB: document.getElementById("t_vizHelpB"),
+      t_footer: document.getElementById("t_footer"),
+
+      // A
+      badgeA: document.getElementById("badgeA"),
+      titleA: document.getElementById("titleA"),
+      rangeA: document.getElementById("rangeA"),
+      descA: document.getElementById("descA"),
+      sliderA: document.getElementById("sliderA"),
+      lettersA: document.getElementById("lettersA"),
+      valA: document.getElementById("valA"),
+      svgWrapA: document.getElementById("svgWrapA"),
+      dotA: document.getElementById("dotA"),
+      chipToneA: document.getElementById("chipToneA"),
+      chipGroupA: document.getElementById("chipGroupA"),
+      chipIdxA: document.getElementById("chipIdxA"),
+
+      // B
+      badgeB: document.getElementById("badgeB"),
+      titleB: document.getElementById("titleB"),
+      rangeB: document.getElementById("rangeB"),
+      descB: document.getElementById("descB"),
+      sliderB: document.getElementById("sliderB"),
+      lettersB: document.getElementById("lettersB"),
+      valB: document.getElementById("valB"),
+      svgWrapB: document.getElementById("svgWrapB"),
+      dotB: document.getElementById("dotB"),
+      chipToneB: document.getElementById("chipToneB"),
+      chipGroupB: document.getElementById("chipGroupB"),
+      chipIdxB: document.getElementById("chipIdxB"),
+    };
+
+    function setLang(next){
+      lang = next;
+      const L = i18n[lang];
+
+      els.btnES.classList.toggle("active", lang==="es");
+      els.btnEN.classList.toggle("active", lang==="en");
+
+      els.t_title.textContent = L.title;
+      els.t_sub.textContent = L.sub;
+      els.t_note.textContent = L.note;
+      els.t_pick.textContent = L.pick;
+      els.t_mode.textContent = L.mode;
+      els.t_letterA.textContent = L.letterA;
+      els.t_letterB.textContent = L.letterB;
+      els.t_educA.textContent = L.educ;
+      els.t_educB.textContent = L.educ;
+      els.t_vizHelpA.textContent = L.vizHelp;
+      els.t_vizHelpB.textContent = L.vizHelp;
+      els.t_footer.textContent = L.footer;
+
+      refreshToggleLabel();
+      renderA();
+      renderB();
+    }
+
+    function setModeCompare(on){
+      compareOn = on;
+      els.toggleCompare.checked = on;
+
+      els.btnSingle.classList.toggle("active", !on);
+      els.btnCompare.classList.toggle("active", on);
+
+      els.grid.classList.toggle("compare", on);
+      els.cardB.style.display = on ? "" : "none";
+
+      refreshToggleLabel();
+    }
+
+    function refreshToggleLabel(){
+      const L = i18n[lang];
+      els.t_toggleCompare.textContent = compareOn ? L.toggleOff : L.toggleOn;
+    }
+
+    function buildLetterButtons(container, getCurrentIdx, setIdx){
+      container.innerHTML = "";
+      letters.forEach((ch, idx)=>{
+        const b = document.createElement("button");
+        b.type = "button";
+        b.textContent = ch;
+        b.className = idx === getCurrentIdx() ? "active" : "";
+        b.addEventListener("click", ()=>{
+          setIdx(idx);
+          // re-render button states
+          [...container.querySelectorAll("button")].forEach((x,i)=> x.classList.toggle("active", i===idx));
+        });
+        container.appendChild(b);
+      });
+    }
+
+    function titleForGroup(g){
+      const L = i18n[lang];
+      return L.groupNames[g];
+    }
+    function rangeForGroup(g){
+      const L = i18n[lang];
+      return L.groupRanges[g];
+    }
+    function descFor(Letter){
+      const L = i18n[lang];
+      const g = groupForLetter(Letter);
+      return L.desc[g](Letter);
+    }
+
+    function renderCard(which, idx){
+      const letter = letters[idx];
+      const group = groupForLetter(letter);
+      const tone = tintForIndex(idx);
+      const hex = rgbToHex(tone);
+
+      const title = titleForGroup(group);
+      const range = rangeForGroup(group);
+
+      if (which==="A"){
+        els.badgeA.textContent = letter;
+        els.valA.textContent = letter;
+        els.titleA.textContent = title;
+        els.rangeA.textContent = `${letter} • ${title} (${range})`;
+        els.descA.textContent = descFor(letter);
+
+        els.svgWrapA.innerHTML = diamondSVG(hex);
+        els.dotA.style.background = hex;
+        els.chipToneA.textContent = `HEX ${hex}`;
+        els.chipGroupA.textContent = `GRP ${group.toUpperCase()} (${range})`;
+        els.chipIdxA.textContent = `IDX ${idx}/22`;
+      } else {
+        els.badgeB.textContent = letter;
+        els.valB.textContent = letter;
+        els.titleB.textContent = title;
+        els.rangeB.textContent = `${letter} • ${title} (${range})`;
+        els.descB.textContent = descFor(letter);
+
+        els.svgWrapB.innerHTML = diamondSVG(hex);
+        els.dotB.style.background = hex;
+        els.chipToneB.textContent = `HEX ${hex}`;
+        els.chipGroupB.textContent = `GRP ${group.toUpperCase()} (${range})`;
+        els.chipIdxB.textContent = `IDX ${idx}/22`;
+      }
+    }
+
+    function renderA(){
+      const idx = parseInt(els.sliderA.value,10);
+      renderCard("A", idx);
+      buildLetterButtons(els.lettersA, ()=>idx, (newIdx)=>{
+        els.sliderA.value = String(newIdx);
+        renderA();
+      });
+    }
+    function renderB(){
+      const idx = parseInt(els.sliderB.value,10);
+      renderCard("B", idx);
+      buildLetterButtons(els.lettersB, ()=>idx, (newIdx)=>{
+        els.sliderB.value = String(newIdx);
+        renderB();
+      });
+    }
+
+    // --- Events ---
+    els.btnES.addEventListener("click", ()=> setLang("es"));
+    els.btnEN.addEventListener("click", ()=> setLang("en"));
+
+    els.btnSingle.addEventListener("click", ()=> setModeCompare(false));
+    els.btnCompare.addEventListener("click", ()=> setModeCompare(true));
+
+    els.toggleCompare.addEventListener("change", (e)=> setModeCompare(e.target.checked));
+
+    els.sliderA.addEventListener("input", ()=> renderA());
+    els.sliderB.addEventListener("input", ()=> renderB());
+
+    // Init: A=D (0), B=K (7) por defecto para que se vea el “lado a lado” útil si activás comparación.
+    els.sliderA.value = "0"; // D
+    els.sliderB.value = "7"; // K
+
+    setLang("es");
+    setModeCompare(true); // arranca con comparación (podés cambiarlo a false si querés)
+  </script>
+</body>
+</html>
